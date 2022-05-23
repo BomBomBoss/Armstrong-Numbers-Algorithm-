@@ -1,0 +1,104 @@
+public class Solution {
+    static long [] [] matrix;
+    static int [] counter;
+
+    public static long [] [] matrixPower(int number) { 
+        long [] [] array = new long[number][9];
+        for (int x = 0; x<9; x++){
+            for (int y = 0; y < number; y++) {
+                array[y][x] = x + 1;
+                for (int count = 0; count < y; count++) {
+                    array[y][x] = array[y][x] * (x+1);
+
+                }
+            }
+        }
+        return array;
+    }
+
+    public static long sumNumber(int[] counter, int pow) { 
+        long result = 0;
+        if (result<0) {return 0;}
+
+        for(int i = 0; i< counter.length; i++) {
+            int number = counter[i];
+            if (number==0) continue;
+                result += matrix[pow][number -1];
+                    if (result<0) {return 1;}
+
+        } return result;
+
+    }
+
+    public static int[] numberDigits(long sum) { 
+        int [] digits = new int[String.valueOf(sum).length()];
+        for (int i = digits.length -1; i>=0;i--) {
+            int remainder = (int)(sum%10);
+            digits[i] = remainder;
+            sum = (sum - remainder) / 10;
+        }
+        return digits;
+    }
+
+    public static boolean armstrongNumber(long sum, int[] digits) { 
+        int number = String.valueOf(sum).length()-1;
+        long check = sumNumber(digits, number);
+        return sum == check ? true : false;
+    }
+
+    public static int [] generator(int[] counter, int index) {
+            if (counter[0]==0) {
+                while(counter[index]==0) {index++;}
+                Arrays.fill(counter, 0, index +1, --counter[index]);
+                return counter;
+            }
+            counter[0]--;
+            return counter;
+    }
+
+
+    public static long[] getNumbers(long N) {
+        int number = String.valueOf(N).length();
+        matrix = matrixPower(19);
+        counter = new int[number];
+        Arrays.fill(counter, 9);
+        TreeSet<Long> sort = new TreeSet<>();
+        long[] result = null;
+
+        while(counter[counter.length-1]>0 && N>0) {
+            int index = 0;
+            int zeroCheckPow = number - 2;
+
+            while (counter[index]==0) {
+                long sum = sumNumber(counter, zeroCheckPow - index); 
+                int [] digits = numberDigits(sum); 
+                if (armstrongNumber(sum, digits) == true && sum<N) sort.add(sum); 
+                index ++;
+            }
+
+            long sum = sumNumber(counter, counter.length -1); 
+            int [] digits = numberDigits(sum); 
+            if ((armstrongNumber(sum, digits) == true) && sum<N) sort.add(sum); 
+            generator(counter, 1);
+
+        }
+        result = new long[sort.size()];
+        int arrayIndex = 0;
+        for(long l : sort) result[arrayIndex++] = l;
+
+        return result;
+    }
+
+    public static void main(String[] args) {
+        long a = System.currentTimeMillis();
+        System.out.println(Arrays.toString(getNumbers(1000)));
+        long b = System.currentTimeMillis();
+        System.out.println("memory " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (8 * 1024));
+        System.out.println("time = " + (b - a) / 1000);
+
+        a = System.currentTimeMillis();
+        System.out.println(Arrays.toString(getNumbers(1000)));
+        b = System.currentTimeMillis();
+        System.out.println("memory " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (8 * 1024));
+        System.out.println("time = " + (b - a) / 1000);
+     }
